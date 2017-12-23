@@ -9,15 +9,15 @@
 import UIKit
 import CoreLocation
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController {
     
     @IBOutlet weak var venueTableView: UITableView!
     @IBOutlet weak var venueSelector: UITextField!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
-    fileprivate let venues = ["food", "drinks", "coffee", "shops", "arts", "outdoors", "sights", "trending", "topPicks"]
-    fileprivate let venuePresenter = VenuePresenter(venueService: RealFSS(), locationService: MockLocationManager())
-    fileprivate var venuesToDisplay = [VenueViewData]()
+    private let venues = ["food", "drinks", "coffee", "shops", "arts", "outdoors", "sights", "trending", "topPicks"]
+    private let venuePresenter = VenuePresenter(venueService: FourSquareService(), locationService: MockLocationManager())
+    private var venuesToDisplay = [VenueViewData]()
     
     var currentLocation: CLLocation?
     
@@ -27,12 +27,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         activityIndicator.hidesWhenStopped = true
         venuePresenter.attachView(self as VenueView)
         venueSelector.loadDropdownData(data: venues, onSelect: venue_onSelect)
+        venuePresenter.locService.delegate = self
+        venueSelector.isUserInteractionEnabled = false
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // request location access
+        
         venuePresenter.requestLocationPermission()
+        if (venuePresenter.isLocationEnabled()){
+            venuePresenter.locService.requestLocation()
+        }
     }
     
     func venue_onSelect(selectedText: String) {
@@ -44,19 +49,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
         if (currentLocation != nil)
         {
-            self.venuePresenter.getVenues(venue: selectedText, loc: currentLocation!)
+            self.venuePresenter.getVenues(venue: selectedText,
+                                          longitude: currentLocation!.coordinate.longitude,
+                                          latitude: currentLocation!.coordinate.latitude)
         }
         else
         {
-            self.venuePresenter.getCurrentLocation()
+            venuePresenter.locService.requestLocation()
             showLocationAlert(false)
         }
     }
 
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        currentLocation = locations.last
-    }
-    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -71,16 +74,39 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
 }
 
+extension ViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        currentLocation = locations.last
+        if (!venueSelector.isUserInteractionEnabled) {
+            venueSelector.isUserInteractionEnabled = true;
+            venuePresenter.getVenues(venue: venues[0],
+                                     longitude: currentLocation!.coordinate.longitude,
+                                     latitude: currentLocation!.coordinate.latitude)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus)
+    {
+        print(status.hashValue)
+    }
+}
+
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return venuesToDisplay.count
     }
         
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "UserCell")
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! SearchCell
         let venueViewData = venuesToDisplay[indexPath.row]
-        cell.textLabel?.text = venueViewData.name + "           " + String(venueViewData.rating)
-        cell.detailTextLabel?.text = venueViewData.address + "          " + String(venueViewData.distance) + " m"
+        cell.title.text = venueViewData.name
+        cell.rating.text = String(venueViewData.rating) + "⭐️"
+        cell.distance.text = String(venueViewData.distance) + "m"
+        cell.address.text = venueViewData.address
         
         return cell
     }
@@ -102,7 +128,7 @@ extension ViewController: VenueView {
         DispatchQueue.main.async {
             self.venuesToDisplay = venues
             self.venueTableView.isHidden = false
-           self.venueTableView.reloadData()
+            self.venueTableView.reloadData()
         }
     }
         
@@ -112,7 +138,4 @@ extension ViewController: VenueView {
         }
     }
     
-    func setLocation(_ location: CLLocation) {
-        currentLocation = location
-    }
 }

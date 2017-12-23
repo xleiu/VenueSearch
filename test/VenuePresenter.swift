@@ -14,20 +14,20 @@ protocol VenueView: NSObjectProtocol {
     func finishLoading()
     func setVenues(_ venues: [VenueViewData])
     func setEmptyVenues()
-    func setLocation(_ location: CLLocation)
 }
 
 class VenuePresenter {
-    fileprivate let venueService: FourSquareService
-    fileprivate let locationService: LocationService
-    weak fileprivate var venueView : VenueView?
+    private let venueService: VenueService!
+    private var locationService: CLLocationManager!
+    weak private var venueView : VenueView?
     
-    init(venueService: FourSquareService, locationService: LocationService) {
+    init(venueService: VenueService, locationService: CLLocationManager) {
         self.venueService = venueService
         self.locationService = locationService
     }
+    var locService: CLLocationManager {get {return locationService} set {}}
     
-    func attachView(_ view: VenueView){
+    func attachView(_ view: VenueView) {
         venueView = view
     }
     
@@ -35,11 +35,10 @@ class VenuePresenter {
         venueView = nil
     }
     
-    func isLocationEnabled() ->Bool {
+    func isLocationEnabled() -> Bool {
         if type(of: locationService).locationServicesEnabled() {
             switch(type(of: locationService).authorizationStatus()) {
             case .authorizedWhenInUse:
-                locationService.requestLocation()
                 return true
             default:
                 return false
@@ -53,15 +52,10 @@ class VenuePresenter {
         locationService.requestWhenInUseAuthorization()
     }
     
-    func getCurrentLocation() {
-        let location = locationService.location
-        venueView?.setLocation(location!)
-    }
-    
-    func getVenues(venue: String, loc: CLLocation) {
+    func getVenues(venue: String, longitude: Double, latitude: Double) {
         self.venueView?.startLoading()
         
-        venueService.getVenues(vanue: venue, longtitute: loc.coordinate.longitude, latitute: loc.coordinate.latitude, { [weak self] venues in
+        venueService.getVenues(vanue: venue, longtitute: longitude, latitute: latitude, { [weak self] venues in
             self?.venueView?.finishLoading()
             if venues.count == 0 {
                 self?.venueView?.setEmptyVenues()

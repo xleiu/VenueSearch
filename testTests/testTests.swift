@@ -9,7 +9,76 @@
 import XCTest
 @testable import test
 
-class testTests: XCTestCase {
+class VenueServiceMock: VenueService {
+    private let venues: [Venue]
+    init(venues: [Venue]) {
+        self.venues = venues
+    }
+    func getVenues(vanue: String, longtitute: Double, latitute: Double, _ callBack: @escaping ([Venue])-> Void) {
+        callBack(self.venues)
+    }
+    
+}
+
+class VenueViewMock : NSObject, VenueView{
+    func startLoading() {
+        startLoadingCalled = true
+    }
+    
+    func finishLoading() {
+        finishLoadingCalled = true
+    }
+    
+    func setVenues(_ venues: [VenueViewData]) {
+        setVenuesCalled = true
+    }
+    
+    func setEmptyVenues() {
+        setEmptyVenuesCalled = true
+    }
+    
+    var setVenuesCalled = false
+    var setEmptyVenuesCalled = false
+    var startLoadingCalled = false
+    var finishLoadingCalled = false
+    
+}
+class VenuePresenterTest: XCTestCase {
+    
+    let emptyVenuesServiceMock = VenueServiceMock(venues: [Venue]())
+    
+    let twoVenuesServiceMock = VenueServiceMock(venues: [Venue(name: "name1", address: "address1", distance: 300, rating: 8),
+                                                     Venue(name: "name2", address: "address2", distance: 200, rating: 5)])
+    
+    func testShouldSetVenues() {
+        //given
+        let venueViewMock = VenueViewMock()
+        let sut = VenuePresenter(venueService: twoVenuesServiceMock, locationService: MockLocationManager())
+        sut.attachView(venueViewMock)
+        
+        //when
+        sut.getVenues(venue:  "", longitude: 12, latitude: 13)
+        
+        //verify
+        XCTAssertTrue(venueViewMock.setVenuesCalled)
+        XCTAssert(venueViewMock.finishLoadingCalled)
+    }
+    
+    func testShouldClearVenues() {
+        let venueViewMock = VenueViewMock()
+        let sut = VenuePresenter(venueService: emptyVenuesServiceMock, locationService: MockLocationManager())
+        sut.attachView(venueViewMock)
+        
+        //when
+        sut.getVenues(venue:  "", longitude: 12, latitude: 13)
+        
+        //verify
+        XCTAssertTrue(venueViewMock.setEmptyVenuesCalled)
+        XCTAssert(venueViewMock.finishLoadingCalled)
+    }
+}
+
+class testLocationService: XCTestCase {
     
     override func setUp() {
         super.setUp()
@@ -21,12 +90,12 @@ class testTests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
+    func testLocationService() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        let sut = VenuePresenter(venueService: MockFSS(), locationService: MockLocationManager())
+        let sut = VenuePresenter(venueService: MockVenueService(), locationService: MockLocationManager())
         XCTAssert(MockLocationManager.locationServicesEnabled())
-        XCTAssert(sut.getCurrentLocation())
+        XCTAssert(sut.isLocationEnabled())
     }
     
     func testPerformanceExample() {

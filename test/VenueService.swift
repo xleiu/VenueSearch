@@ -8,12 +8,12 @@ struct Venue
     let rating: Double
 }
 
-protocol FourSquareService
+protocol VenueService
 {
     func getVenues(vanue: String, longtitute: Double, latitute: Double, _ callBack: @escaping ([Venue])-> Void)
 }
 
-class RealFSS : FourSquareService
+class FourSquareService : VenueService
 {
     let client_id = ""
     let client_secret = ""
@@ -46,7 +46,7 @@ class RealFSS : FourSquareService
     }
 }
 
-class MockFSS : FourSquareService
+class MockVenueService : VenueService
 {
     func getVenues(vanue venue: String, longtitute longtitude: Double, latitute latitude: Double, _ callBack: @escaping ([Venue])-> Void)
     {
