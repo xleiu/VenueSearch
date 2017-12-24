@@ -15,8 +15,8 @@ protocol VenueService
 
 class FourSquareService : VenueService
 {
-    let client_id = ""
-    let client_secret = ""
+    let client_id = "CYEMKOM4OLTP5PHMOFVUJJAMWT5CH5G1JBCYREATW21XLLSZ"
+    let client_secret = "GYNP4URASNYRNRGXR5UEN2TGTKJHXY5FGSAXTIHXEUG1GYM2"
 
     func getVenues(vanue venue: String, longtitute longtitude: Double, latitute latitude: Double, _ callBack: @escaping ([Venue])-> Void)
     {

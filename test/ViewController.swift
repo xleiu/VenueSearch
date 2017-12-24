@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     private let venues = ["food", "drinks", "coffee", "shops", "arts", "outdoors", "sights", "trending", "topPicks"]
-    private let venuePresenter = VenuePresenter(venueService: MockVenueService(), locationService: MockLocationManager())
+    private let venuePresenter = VenuePresenter(venueService: FourSquareService(), locationService: CLLocationManager())
     private var venuesToDisplay = [VenueViewData]()
     
     var currentLocation: CLLocation?
@@ -27,7 +27,7 @@ class ViewController: UIViewController {
         activityIndicator.hidesWhenStopped = true
         venuePresenter.attachView(self as VenueView)
         venueSelector.loadDropdownData(data: venues, onSelect: venue_onSelect)
-        venuePresenter.locService.delegate = self
+        //venuePresenter.locService.delegate = self
         venueSelector.isUserInteractionEnabled = false
     }
     
@@ -36,7 +36,7 @@ class ViewController: UIViewController {
         
         venuePresenter.requestLocationPermission()
         if (venuePresenter.isLocationEnabled()){
-            venuePresenter.locService.requestLocation()
+            venuePresenter.getCurrentLocation()
         }
     }
     
@@ -55,7 +55,7 @@ class ViewController: UIViewController {
         }
         else
         {
-            venuePresenter.locService.requestLocation()
+            venuePresenter.getCurrentLocation()
             showLocationAlert(false)
         }
     }
@@ -92,6 +92,9 @@ extension ViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus)
     {
         print(status.hashValue)
+        if (status == CLAuthorizationStatus.authorizedAlways || status == CLAuthorizationStatus.authorizedWhenInUse) && currentLocation == nil {
+            venuePresenter.getCurrentLocation()
+        }
     }
 }
 
@@ -114,6 +117,10 @@ extension ViewController: UITableViewDataSource {
 }
 
 extension ViewController: VenueView {
+    func attachLocatoinDelegate(_ locationService: CLLocationManager) {
+        locationService.delegate = self
+    }
+    
         
     func startLoading() {
         activityIndicator.startAnimating()
@@ -138,5 +145,7 @@ extension ViewController: VenueView {
             self.venueTableView.isHidden = true
         }
     }
+    
+    
     
 }

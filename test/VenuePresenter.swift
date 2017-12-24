@@ -14,6 +14,7 @@ protocol VenueView: NSObjectProtocol {
     func finishLoading()
     func setVenues(_ venues: [VenueViewData])
     func setEmptyVenues()
+    func attachLocatoinDelegate(_ locationService: CLLocationManager)
 }
 
 class VenuePresenter {
@@ -25,10 +26,10 @@ class VenuePresenter {
         self.venueService = venueService
         self.locationService = locationService
     }
-    var locService: CLLocationManager {get {return locationService} }
     
     func attachView(_ view: VenueView) {
         venueView = view
+        view.attachLocatoinDelegate(locationService)
     }
     
     func detachView() {
@@ -50,6 +51,10 @@ class VenuePresenter {
     
     func requestLocationPermission() {
         locationService.requestWhenInUseAuthorization()
+    }
+    
+    func getCurrentLocation() {
+        locationService.requestLocation()
     }
     
     func getVenues(venue: String, longitude: Double, latitude: Double) {
