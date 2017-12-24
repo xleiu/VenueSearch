@@ -18,14 +18,14 @@ protocol VenueView: NSObjectProtocol {
 
 class VenuePresenter {
     private let venueService: VenueService!
-    private var locationService: CLLocationManager!
+    private let locationService: CLLocationManager!
     weak private var venueView : VenueView?
     
     init(venueService: VenueService, locationService: CLLocationManager) {
         self.venueService = venueService
         self.locationService = locationService
     }
-    var locService: CLLocationManager {get {return locationService} set {}}
+    var locService: CLLocationManager {get {return locationService} }
     
     func attachView(_ view: VenueView) {
         venueView = view

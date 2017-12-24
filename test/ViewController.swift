@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     private let venues = ["food", "drinks", "coffee", "shops", "arts", "outdoors", "sights", "trending", "topPicks"]
-    private let venuePresenter = VenuePresenter(venueService: FourSquareService(), locationService: MockLocationManager())
+    private let venuePresenter = VenuePresenter(venueService: MockVenueService(), locationService: MockLocationManager())
     private var venuesToDisplay = [VenueViewData]()
     
     var currentLocation: CLLocation?
@@ -86,6 +86,7 @@ extension ViewController: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error.localizedDescription)
     }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus)
