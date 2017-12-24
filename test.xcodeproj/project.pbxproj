@@ -20,6 +20,7 @@
 		843361BB1FE95555007DC5F3 /* VenueService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843361BA1FE95555007DC5F3 /* VenueService.swift */; };
 		843361BD1FE957CA007DC5F3 /* SwiftyJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843361BC1FE957CA007DC5F3 /* SwiftyJson.swift */; };
 		843361BF1FEE8D61007DC5F3 /* SearchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843361BE1FEE8D61007DC5F3 /* SearchCell.swift */; };
+		8490210C1FEFE64900497251 /* Configure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8490210B1FEFE64900497251 /* Configure.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 		843361BA1FE95555007DC5F3 /* VenueService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VenueService.swift; sourceTree = "<group>"; };
 		843361BC1FE957CA007DC5F3 /* SwiftyJson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyJson.swift; sourceTree = "<group>"; };
 		843361BE1FEE8D61007DC5F3 /* SearchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchCell.swift; sourceTree = "<group>"; };
+		8490210B1FEFE64900497251 /* Configure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configure.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +123,7 @@
 				8433618D1FE878C6007DC5F3 /* Assets.xcassets */,
 				8433618F1FE878C6007DC5F3 /* LaunchScreen.storyboard */,
 				843361921FE878C6007DC5F3 /* Info.plist */,
+				8490210B1FEFE64900497251 /* Configure.swift */,
 			);
 			path = test;
 			sourceTree = "<group>";
@@ -282,6 +285,7 @@
 				843361891FE878C6007DC5F3 /* ViewController.swift in Sources */,
 				843361B91FE9554A007DC5F3 /* LocationService.swift in Sources */,
 				843361B81FE9554A007DC5F3 /* VenuePresenter.swift in Sources */,
+				8490210C1FEFE64900497251 /* Configure.swift in Sources */,
 				843361BB1FE95555007DC5F3 /* VenueService.swift in Sources */,
 				843361871FE878C6007DC5F3 /* AppDelegate.swift in Sources */,
 				843361BD1FE957CA007DC5F3 /* SwiftyJson.swift in Sources */,
