@@ -7,3 +7,9 @@
 //
 
 import Foundation
+
+struct FourSqureClient {
+    static var client_id = "CYEMKOM4OLTP5PHMOFVUJJAMWT5CH5G1JBCYREATW21XLLSZ"
+    static var client_secret = "GYNP4URASNYRNRGXR5UEN2TGTKJHXY5FGSAXTIHXEUG1GYM2"
+}
+

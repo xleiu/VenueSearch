@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     private let venues = ["food", "drinks", "coffee", "shops", "arts", "outdoors", "sights", "trending", "topPicks"]
-    private let venuePresenter = VenuePresenter(venueService: FourSquareService(), locationService: CLLocationManager())
+    private let venuePresenter = VenuePresenter(venueService: MockVenueService(), locationService: CLLocationManager())
     private var venuesToDisplay = [VenueViewData]()
     
     var currentLocation: CLLocation?
@@ -42,19 +42,16 @@ class ViewController: UIViewController {
     
     func venue_onSelect(selectedText: String) {
         self.venueSelector.resignFirstResponder()
-        if (!venuePresenter.isLocationEnabled())
-        {
+        if (!venuePresenter.isLocationEnabled()) {
             showLocationAlert(true)
             return;
         }
-        if (currentLocation != nil)
-        {
+        if (currentLocation != nil) {
             self.venuePresenter.getVenues(venue: selectedText,
                                           longitude: currentLocation!.coordinate.longitude,
                                           latitude: currentLocation!.coordinate.latitude)
         }
-        else
-        {
+        else {
             venuePresenter.getCurrentLocation()
             showLocationAlert(false)
         }
@@ -89,8 +86,7 @@ extension ViewController: CLLocationManagerDelegate {
         print(error.localizedDescription)
     }
     
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus)
-    {
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         print(status.hashValue)
         if (status == CLAuthorizationStatus.authorizedAlways || status == CLAuthorizationStatus.authorizedWhenInUse) && currentLocation == nil {
             venuePresenter.getCurrentLocation()
@@ -145,7 +141,4 @@ extension ViewController: VenueView {
             self.venueTableView.isHidden = true
         }
     }
-    
-    
-    
 }

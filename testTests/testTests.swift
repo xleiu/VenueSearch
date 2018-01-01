@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import CoreLocation
+
 @testable import test
 
 class VenueServiceMock: VenueService {
@@ -21,6 +23,10 @@ class VenueServiceMock: VenueService {
 }
 
 class VenueViewMock : NSObject, VenueView{
+    func attachLocatoinDelegate(_ locationService: CLLocationManager) {
+        
+    }
+    
     func startLoading() {
         startLoadingCalled = true
     }

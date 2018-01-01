@@ -1,8 +1,7 @@
 import Foundation
 import CoreLocation
 
-struct VenueViewData
-{
+struct VenueViewData {
     let name: String
     let address: String
     let distance: Int
