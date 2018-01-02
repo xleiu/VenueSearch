@@ -10,14 +10,12 @@ class MockLocationManager: CLLocationManager {
         return true;
     }
     
-    override class func authorizationStatus() -> CLAuthorizationStatus
-    {
+    override class func authorizationStatus() -> CLAuthorizationStatus {
         return .authorizedWhenInUse
     }
     
     override func requestLocation() {
         delegate?.locationManager?(self, didUpdateLocations: [CLLocation(latitude: 60.2365327, longitude: 24.782747)])
-        
     }
 }
 

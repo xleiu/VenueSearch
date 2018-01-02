@@ -13,16 +13,47 @@ import CoreLocation
 
 class VenueServiceMock: VenueService {
     private let venues: [Venue]
+    
     init(venues: [Venue]) {
         self.venues = venues
     }
+    
     func getVenues(vanue: String, longtitute: Double, latitute: Double, _ callBack: @escaping ([Venue])-> Void) {
         callBack(self.venues)
     }
     
 }
 
-class VenueViewMock : NSObject, VenueView{
+class VenueViewMock : NSObject, VenueView {
+    var setVenuesCalled = false
+    var setEmptyVenuesCalled = false
+    var startLoadingCalled = false
+    var finishLoadingCalled = false
+    var locationNotAvailableCalled = false
+    var locationDisableCalled = false
+    
+    var isVenueSelectorEnabled: Bool
+    
+    override init() {
+        isVenueSelectorEnabled = true
+    }
+    
+    func setVenues(_ empty: Bool) {
+        if empty {
+            setVenuesCalled = true
+        } else {
+            setEmptyVenuesCalled = true
+        }
+    }
+    
+    func showLocationAlert(_ errorType: Bool) {
+        if (errorType) {
+            locationDisableCalled = true
+        } else {
+            locationNotAvailableCalled = true
+        }
+    }
+    
     func attachLocatoinDelegate(_ locationService: CLLocationManager) {
         
     }
@@ -34,21 +65,37 @@ class VenueViewMock : NSObject, VenueView{
     func finishLoading() {
         finishLoadingCalled = true
     }
-    
-    func setVenues(_ venues: [VenueViewData]) {
-        setVenuesCalled = true
-    }
-    
-    func setEmptyVenues() {
-        setEmptyVenuesCalled = true
-    }
-    
-    var setVenuesCalled = false
-    var setEmptyVenuesCalled = false
-    var startLoadingCalled = false
-    var finishLoadingCalled = false
-    
 }
+
+class MockLCManager: CLLocationManager {
+    var requestLocationCalled = false
+    var requestWheInUseAuthorizationCalled = false
+
+    override func requestWhenInUseAuthorization() -> Void {
+        requestWheInUseAuthorizationCalled = true
+    }
+    
+    override class func locationServicesEnabled() -> Bool {
+        return true
+    }
+    
+    override class func authorizationStatus() -> CLAuthorizationStatus {
+        return .authorizedWhenInUse
+    }
+    
+    override func requestLocation() {
+        requestLocationCalled = true
+    }
+}
+
+class MockLCManagerDisableLocation: MockLCManager {
+    
+    override class func locationServicesEnabled() -> Bool {
+        return false;
+    }
+}
+
+
 class VenuePresenterTest: XCTestCase {
     
     let emptyVenuesServiceMock = VenueServiceMock(venues: [Venue]())
@@ -59,7 +106,7 @@ class VenuePresenterTest: XCTestCase {
     func testShouldSetVenues() {
         //given
         let venueViewMock = VenueViewMock()
-        let sut = VenuePresenter(venueService: twoVenuesServiceMock, locationService: MockLocationManager())
+        let sut = VenuePresenter(venueService: twoVenuesServiceMock, locationService: MockLCManager())
         sut.attachView(venueViewMock)
         
         //when
@@ -72,7 +119,7 @@ class VenuePresenterTest: XCTestCase {
     
     func testShouldClearVenues() {
         let venueViewMock = VenueViewMock()
-        let sut = VenuePresenter(venueService: emptyVenuesServiceMock, locationService: MockLocationManager())
+        let sut = VenuePresenter(venueService: emptyVenuesServiceMock, locationService: MockLCManager())
         sut.attachView(venueViewMock)
         
         //when
@@ -86,29 +133,54 @@ class VenuePresenterTest: XCTestCase {
 
 class testLocationService: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
-    func testLocationService() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        let sut = VenuePresenter(venueService: MockVenueService(), locationService: MockLocationManager())
+    func testLocationService_with_permission() {
+        let venueViewMock = VenueViewMock()
+        
+        let sut = VenuePresenter(venueService: MockVenueService(), locationService: MockLCManager())
+        sut.attachView(venueViewMock)
         XCTAssert(MockLocationManager.locationServicesEnabled())
         XCTAssert(sut.isLocationEnabled())
+        
+        sut.showSelectedVenue(venue: "")
+        XCTAssert(venueViewMock.locationNotAvailableCalled)
     }
     
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+    func testLocationService_without_Permission() {
+        let venueViewMock = VenueViewMock()
+        
+        let sut = VenuePresenter(venueService: MockVenueService(), locationService: MockLCManagerDisableLocation())
+        sut.attachView(venueViewMock)
+        
+        XCTAssertFalse(MockLCManagerDisableLocation.locationServicesEnabled())
+        
+        XCTAssert(!sut.isLocationEnabled())
+        
+        sut.showSelectedVenue(venue: "")
+        XCTAssert(venueViewMock.locationDisableCalled)
+    }
+    
+    func testLocationService_with_valid_location() {
+        let venueViewMock = VenueViewMock()
+        
+        let sut = VenuePresenter(venueService: MockVenueService(), locationService: MockLCManager())
+        sut.attachView(venueViewMock)
+        XCTAssert(MockLCManager.locationServicesEnabled())
+        XCTAssert(sut.isLocationEnabled())
+        sut.locaionUpdated([CLLocation(latitude: 60.2365327, longitude: 24.782747)])
+        sut.showSelectedVenue(venue: "")
+        XCTAssert(!venueViewMock.locationNotAvailableCalled)
+        XCTAssert(!venueViewMock.locationDisableCalled)
+    }
+    
+    func testLocationService_related_function_called() {
+        let venueViewMock = VenueViewMock()
+        let lcManager = MockLCManager()
+        
+        let sut = VenuePresenter(venueService: MockVenueService(), locationService: lcManager)
+        sut.attachView(venueViewMock)
+        sut.viewWillAppear()
+        XCTAssert(lcManager.requestWheInUseAuthorizationCalled)
+        XCTAssert(lcManager.requestLocationCalled)
     }
     
 }

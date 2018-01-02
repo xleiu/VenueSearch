@@ -31,8 +31,8 @@ class FourSquareService : VenueService {
             let venue = json["response"]["groups"][0]["items"].arrayValue
             
             let venueResult = venue.map {
-                return Venue(name: "\($0["venue"]["name"].string ?? "unknown")",
-                             address: "\($0["venue"]["location"]["address"].string ?? "unknown")",
+                return Venue(name: $0["venue"]["name"].string ?? "unknown",
+                             address: $0["venue"]["location"]["address"].string ?? "unknown",
                              distance: $0["venue"]["location"]["distance"].intValue,
                              rating: $0["venue"]["rating"].doubleValue)
             }
