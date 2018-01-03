@@ -98,15 +98,14 @@ class VenuePresenter {
             venueView?.showErrorAlert("Location Disabled", "Please enable location", VenueErrorType.LocationAuthentication)
             return;
         }
-        if (currentLocation != nil) {
-            getVenues(venue: venue,
-                      longitude: currentLocation!.coordinate.longitude,
-                      latitude: currentLocation!.coordinate.latitude)
-        }
-        else {
+        
+        guard let location = currentLocation else {
             getCurrentLocation()
             venueView?.showErrorAlert("Getting Location", "Please wait", VenueErrorType.WaitForLocation)
+            return
         }
+        
+        getVenues(venue: venue, longitude: location.coordinate.longitude, latitude: location.coordinate.latitude)
     }
     
     // MARK: location delegate

@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "843361821FE878C6007DC5F3"
-               BuildableName = "test.app"
-               BlueprintName = "test"
-               ReferencedContainer = "container:test.xcodeproj">
+               BuildableName = "VenueSearch.app"
+               BlueprintName = "VenueSearch"
+               ReferencedContainer = "container:VenueSearch.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -34,9 +34,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "843361961FE878C6007DC5F3"
-               BuildableName = "testTests.xctest"
-               BlueprintName = "testTests"
-               ReferencedContainer = "container:test.xcodeproj">
+               BuildableName = "VenueSearchTests.xctest"
+               BlueprintName = "VenueSearchTests"
+               ReferencedContainer = "container:VenueSearch.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -44,9 +44,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "843361A11FE878C6007DC5F3"
-               BuildableName = "testUITests.xctest"
-               BlueprintName = "testUITests"
-               ReferencedContainer = "container:test.xcodeproj">
+               BuildableName = "VenueSearchUITests.xctest"
+               BlueprintName = "VenueSearchUITests"
+               ReferencedContainer = "container:VenueSearch.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -54,9 +54,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "843361821FE878C6007DC5F3"
-            BuildableName = "test.app"
-            BlueprintName = "test"
-            ReferencedContainer = "container:test.xcodeproj">
+            BuildableName = "VenueSearch.app"
+            BlueprintName = "VenueSearch"
+            ReferencedContainer = "container:VenueSearch.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -78,9 +78,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "843361821FE878C6007DC5F3"
-            BuildableName = "test.app"
-            BlueprintName = "test"
-            ReferencedContainer = "container:test.xcodeproj">
+            BuildableName = "VenueSearch.app"
+            BlueprintName = "VenueSearch"
+            ReferencedContainer = "container:VenueSearch.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -101,9 +101,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "843361821FE878C6007DC5F3"
-            BuildableName = "test.app"
-            BlueprintName = "test"
-            ReferencedContainer = "container:test.xcodeproj">
+            BuildableName = "VenueSearch.app"
+            BlueprintName = "VenueSearch"
+            ReferencedContainer = "container:VenueSearch.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -19,7 +19,7 @@ class ViewController: UIViewController {
         
     }
     
-    private let venuePresenter = VenuePresenter(venueService: FourSquareService(), locationService: CLLocationManager())
+    private let venuePresenter = VenuePresenter(venueService: FourSquareService(), locationService: MockLocationManager())
     
     override func viewDidLoad() {
         super.viewDidLoad()

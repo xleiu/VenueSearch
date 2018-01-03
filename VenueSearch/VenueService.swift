@@ -14,9 +14,10 @@ protocol VenueService {
 class FourSquareService : VenueService {
     let client_id = FourSqureClient.client_id
     let client_secret = FourSqureClient.client_secret
+    let venue_limit = FourSqureClient.venue_limit
 
     func getVenues(vanue venue: String, longtitute longtitude: Double, latitute latitude: Double, _ callBack: @escaping ([Venue], String, VenueErrorType)-> Void) {
-        let url = "https://api.foursquare.com/v2/venues/explore?ll=\(latitude),\(longtitude)&v=20171220&section=\(venue)&limit=15&client_id=\(client_id)&client_secret=\(client_secret)"
+        let url = "https://api.foursquare.com/v2/venues/explore?ll=\(latitude),\(longtitude)&v=20171220&section=\(venue)&limit=\(venue_limit)&client_id=\(client_id)&client_secret=\(client_secret)"
         print(url)
         let request = NSMutableURLRequest(url: URL(string: url)!)
         let session = URLSession.shared
@@ -29,19 +30,22 @@ class FourSquareService : VenueService {
         let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, err -> Void in
             if err != nil {
                 callBack([Venue](), err!.localizedDescription, .Network)
-            } else {
-                // todo handle json parsing error
-                let json = JSON(data: data!)
-                let venue = json["response"]["groups"][0]["items"].arrayValue
-            
-                let venueResult = venue.map {
-                    return Venue(name: $0["venue"]["name"].string ?? "unknown",
-                                 address: $0["venue"]["location"]["address"].string ?? "unknown",
-                                 distance: $0["venue"]["location"]["distance"].intValue,
-                                 rating: $0["venue"]["rating"].doubleValue)
-                }
-                callBack(venueResult, "", .None)
+                return
             }
+            guard let data = data else {
+                callBack([Venue](), "json data is empty", VenueErrorType.JsonParse)
+                return
+            }
+            let json = JSON(data: data)
+            let venue = json["response"]["groups"][0]["items"].arrayValue
+            
+            let venueResult = venue.map {
+                return Venue(name: $0["venue"]["name"].string ?? "unknown",
+                             address: $0["venue"]["location"]["address"].string ?? "unknown",
+                             distance: $0["venue"]["location"]["distance"].intValue,
+                             rating: $0["venue"]["rating"].doubleValue)
+            }
+            callBack(venueResult, "", .None)
         })
         task.resume()
     }

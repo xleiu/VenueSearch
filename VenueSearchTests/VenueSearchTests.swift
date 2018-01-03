@@ -1,15 +1,7 @@
-//
-//  testTests.swift
-//  testTests
-//
-//  Created by admin on 19/12/2017.
-//  Copyright © 2017 admin. All rights reserved.
-//
-
 import XCTest
 import CoreLocation
 
-@testable import test
+@testable import VenueSearch
 
 class VenueServiceMock: VenueService {
     private let venues: [Venue]
