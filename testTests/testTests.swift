@@ -13,13 +13,16 @@ import CoreLocation
 
 class VenueServiceMock: VenueService {
     private let venues: [Venue]
+    private var error = ""
+    var errorType = VenueErrorType.None
     
     init(venues: [Venue]) {
         self.venues = venues
     }
     
-    func getVenues(vanue: String, longtitute: Double, latitute: Double, _ callBack: @escaping ([Venue])-> Void) {
-        callBack(self.venues)
+    func getVenues(vanue: String, longtitute: Double, latitute: Double,
+                   _ callBack: @escaping ([Venue], String, VenueErrorType)-> Void) {
+        callBack(self.venues, error, errorType)
     }
     
 }
@@ -31,7 +34,7 @@ class VenueViewMock : NSObject, VenueView {
     var finishLoadingCalled = false
     var locationNotAvailableCalled = false
     var locationDisableCalled = false
-    
+    var networkErrorCalled = false
     var isVenueSelectorEnabled: Bool
     
     override init() {
@@ -46,11 +49,19 @@ class VenueViewMock : NSObject, VenueView {
         }
     }
     
-    func showLocationAlert(_ errorType: Bool) {
-        if (errorType) {
+    func showErrorAlert(_ title: String, _ message: String, _ errorType: VenueErrorType){
+        switch errorType {
+        case .LocationAuthentication:
             locationDisableCalled = true
-        } else {
+            
+        case .WaitForLocation:
             locationNotAvailableCalled = true
+            
+        case .Network:
+            networkErrorCalled = true
+            
+        default:
+            print(errorType)
         }
     }
     
@@ -129,6 +140,18 @@ class VenuePresenterTest: XCTestCase {
         XCTAssertTrue(venueViewMock.setEmptyVenuesCalled)
         XCTAssert(venueViewMock.finishLoadingCalled)
     }
+    
+    func testShouldShowNetworkError() {
+        emptyVenuesServiceMock.errorType = VenueErrorType.Network
+        let venueViewMock = VenueViewMock()
+        let sut = VenuePresenter(venueService: emptyVenuesServiceMock, locationService: MockLCManager())
+        sut.attachView(venueViewMock)
+        
+        //when
+        sut.getVenues(venue:  "", longitude: 12, latitude: 13)
+        
+        XCTAssert(venueViewMock.networkErrorCalled)
+    }
 }
 
 class testLocationService: XCTestCase {
@@ -172,7 +195,7 @@ class testLocationService: XCTestCase {
         XCTAssert(!venueViewMock.locationDisableCalled)
     }
     
-    func testLocationService_related_function_called() {
+    func testLocationService_location_will_be_fetched_after_view_isShown() {
         let venueViewMock = VenueViewMock()
         let lcManager = MockLCManager()
         

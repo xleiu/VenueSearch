@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var venueSelector: UITextField!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
-    @IBAction func custmizedVenue(_ sender: UITextField) {
+    @IBAction func customizedVenue(_ sender: UITextField) {
         
     }
     
@@ -112,9 +112,7 @@ extension ViewController: VenueView {
         set { venueSelector.isUserInteractionEnabled = newValue }
     }
     
-    func showLocationAlert(_ disabled: Bool) {
-        let title = disabled ? String("Location Disabled") : String("Getting locations")
-        let message = disabled ? String("Please enable location") : String("Please waiting for location")
+    func showErrorAlert(_ title: String, _ message: String, _ errorType: VenueErrorType) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
         present(alert, animated: true, completion: nil)

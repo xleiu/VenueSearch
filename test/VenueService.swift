@@ -8,14 +8,14 @@ struct Venue {
 }
 
 protocol VenueService {
-    func getVenues(vanue: String, longtitute: Double, latitute: Double, _ callBack: @escaping ([Venue])-> Void)
+    func getVenues(vanue: String, longtitute: Double, latitute: Double, _ callBack: @escaping ([Venue], String, VenueErrorType)-> Void)
 }
 
 class FourSquareService : VenueService {
     let client_id = FourSqureClient.client_id
     let client_secret = FourSqureClient.client_secret
 
-    func getVenues(vanue venue: String, longtitute longtitude: Double, latitute latitude: Double, _ callBack: @escaping ([Venue])-> Void) {
+    func getVenues(vanue venue: String, longtitute longtitude: Double, latitute latitude: Double, _ callBack: @escaping ([Venue], String, VenueErrorType)-> Void) {
         let url = "https://api.foursquare.com/v2/venues/explore?ll=\(latitude),\(longtitude)&v=20171220&section=\(venue)&limit=15&client_id=\(client_id)&client_secret=\(client_secret)"
         print(url)
         let request = NSMutableURLRequest(url: URL(string: url)!)
@@ -27,23 +27,28 @@ class FourSquareService : VenueService {
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         
         let task = session.dataTask(with: request as URLRequest, completionHandler: {data, response, err -> Void in
-            let json = JSON(data: data!)
-            let venue = json["response"]["groups"][0]["items"].arrayValue
+            if err != nil {
+                callBack([Venue](), err!.localizedDescription, .Network)
+            } else {
+                // todo handle json parsing error
+                let json = JSON(data: data!)
+                let venue = json["response"]["groups"][0]["items"].arrayValue
             
-            let venueResult = venue.map {
-                return Venue(name: $0["venue"]["name"].string ?? "unknown",
-                             address: $0["venue"]["location"]["address"].string ?? "unknown",
-                             distance: $0["venue"]["location"]["distance"].intValue,
-                             rating: $0["venue"]["rating"].doubleValue)
+                let venueResult = venue.map {
+                    return Venue(name: $0["venue"]["name"].string ?? "unknown",
+                                 address: $0["venue"]["location"]["address"].string ?? "unknown",
+                                 distance: $0["venue"]["location"]["distance"].intValue,
+                                 rating: $0["venue"]["rating"].doubleValue)
+                }
+                callBack(venueResult, "", .None)
             }
-            callBack(venueResult)
         })
         task.resume()
     }
 }
 
 class MockVenueService : VenueService {
-    func getVenues(vanue venue: String, longtitute longtitude: Double, latitute latitude: Double, _ callBack: @escaping ([Venue])-> Void) {
+    func getVenues(vanue venue: String, longtitute longtitude: Double, latitute latitude: Double, _ callBack: @escaping ([Venue], String, VenueErrorType)-> Void) {
         var venues = [Venue]()
         let range = 0...20
         for (n, _) in range.enumerated() {
@@ -55,7 +60,7 @@ class MockVenueService : VenueService {
         }
         let delayTime = DispatchTime.now() + Double(Int64(2 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
         DispatchQueue.main.asyncAfter(deadline: delayTime) {
-            callBack(venues)
+            callBack(venues, "", .None)
         } 
     }
 }

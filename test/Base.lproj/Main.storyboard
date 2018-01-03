@@ -86,7 +86,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                                 <connections>
-                                    <action selector="custmizedVenue:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="iSc-uS-KoI"/>
+                                    <action selector="customizedVenue:" destination="BYZ-38-t0r" eventType="editingDidEnd" id="iSc-uS-KoI"/>
                                 </connections>
                             </textField>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="5d3-N8-YTQ">

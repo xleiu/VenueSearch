@@ -14,7 +14,7 @@ protocol VenueView: NSObjectProtocol {
     func finishLoading()
     func setVenues(_ empty: Bool)
     func attachLocatoinDelegate(_ locationService: CLLocationManager)
-    func showLocationAlert(_ errorType: Bool)
+    func showErrorAlert(_ title: String, _ message: String, _ errorType: VenueErrorType)
 }
 
 class VenuePresenter {
@@ -74,7 +74,7 @@ class VenuePresenter {
     func getVenues(venue: String, longitude: Double, latitude: Double) {
         self.venueView?.startLoading()
         
-        venueService.getVenues(vanue: venue, longtitute: longitude, latitute: latitude, { [weak self] venues in
+        venueService.getVenues(vanue: venue, longtitute: longitude, latitute: latitude, { [weak self] venues, error, errorType in
             self?.venueView?.finishLoading()
             if venues.count == 0 {
                 self?.venueView?.setVenues(false)
@@ -87,12 +87,15 @@ class VenuePresenter {
                 }
                 self?.venueView?.setVenues(true)
             }
+            if errorType != VenueErrorType.None {
+                self?.venueView?.showErrorAlert("venue service error", error, errorType)
+            }
         })
     }
     
     func showSelectedVenue(venue: String) {
         if (!isLocationEnabled()) {
-            venueView?.showLocationAlert(true)
+            venueView?.showErrorAlert("Location Disabled", "Please enable location", VenueErrorType.LocationAuthentication)
             return;
         }
         if (currentLocation != nil) {
@@ -102,7 +105,7 @@ class VenuePresenter {
         }
         else {
             getCurrentLocation()
-            venueView?.showLocationAlert(false)
+            venueView?.showErrorAlert("Getting Location", "Please wait", VenueErrorType.WaitForLocation)
         }
     }
     
@@ -119,6 +122,7 @@ class VenuePresenter {
     
     func locationError(_ error: Error) {
         print(error.localizedDescription)
+        venueView?.showErrorAlert("Location error", error.localizedDescription, VenueErrorType.Location)
     }
     
     func locationAuthorizationChanged(_ status: CLAuthorizationStatus) {

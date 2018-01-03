@@ -21,6 +21,7 @@
 		843361BD1FE957CA007DC5F3 /* SwiftyJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843361BC1FE957CA007DC5F3 /* SwiftyJson.swift */; };
 		843361BF1FEE8D61007DC5F3 /* SearchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843361BE1FEE8D61007DC5F3 /* SearchCell.swift */; };
 		8490210E1FFAF17E00497251 /* Configure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8490210D1FFAF17E00497251 /* Configure.swift */; };
+		8490213C1FFCBBA800497251 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8490213B1FFCBBA800497251 /* Error.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		843361BC1FE957CA007DC5F3 /* SwiftyJson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyJson.swift; sourceTree = "<group>"; };
 		843361BE1FEE8D61007DC5F3 /* SearchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchCell.swift; sourceTree = "<group>"; };
 		8490210D1FFAF17E00497251 /* Configure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configure.swift; sourceTree = "<group>"; };
+		8490213B1FFCBBA800497251 /* Error.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +126,7 @@
 				8433618F1FE878C6007DC5F3 /* LaunchScreen.storyboard */,
 				843361921FE878C6007DC5F3 /* Info.plist */,
 				8490210D1FFAF17E00497251 /* Configure.swift */,
+				8490213B1FFCBBA800497251 /* Error.swift */,
 			);
 			path = test;
 			sourceTree = "<group>";
@@ -288,6 +291,7 @@
 				8490210E1FFAF17E00497251 /* Configure.swift in Sources */,
 				843361BB1FE95555007DC5F3 /* VenueService.swift in Sources */,
 				843361871FE878C6007DC5F3 /* AppDelegate.swift in Sources */,
+				8490213C1FFCBBA800497251 /* Error.swift in Sources */,
 				843361BD1FE957CA007DC5F3 /* SwiftyJson.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
