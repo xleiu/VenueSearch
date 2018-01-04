@@ -80,7 +80,7 @@ extension ViewController: UITableViewDataSource {
         
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! SearchCell
-        venuePresenter.configure(forRow: indexPath.row, cell: cell)
+        venuePresenter.configureCell(forRow: indexPath.row, cell: cell)
         return cell
     }
 }

@@ -19,7 +19,11 @@ class FourSquareService : VenueService {
     func getVenues(vanue venue: String, longtitute longtitude: Double, latitute latitude: Double, _ callBack: @escaping ([Venue], String, VenueErrorType)-> Void) {
         let url = "https://api.foursquare.com/v2/venues/explore?ll=\(latitude),\(longtitude)&v=20171220&section=\(venue)&limit=\(venue_limit)&client_id=\(client_id)&client_secret=\(client_secret)"
         print(url)
-        let request = NSMutableURLRequest(url: URL(string: url)!)
+        guard let validUrl = URL(string: url) else {
+            callBack([Venue](), "requested venue is illegal", .Network)
+            return
+        }
+        let request = NSMutableURLRequest(url: validUrl)
         let session = URLSession.shared
         
         request.httpMethod = "GET"

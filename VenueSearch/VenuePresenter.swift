@@ -71,28 +71,6 @@ class VenuePresenter {
         locationService.requestLocation()
     }
     
-    func getVenues(venue: String, longitude: Double, latitude: Double) {
-        self.venueView?.startLoading()
-        
-        venueService.getVenues(vanue: venue, longtitute: longitude, latitute: latitude, { [weak self] venues, error, errorType in
-            self?.venueView?.finishLoading()
-            if venues.count == 0 {
-                self?.venueView?.setVenues(false)
-            } else {
-                self?.venuesToDisplay = venues.map {
-                    return VenueViewData(name: $0.name,
-                                         address: $0.address,
-                                         distance: $0.distance,
-                                         rating: $0.rating)
-                }
-                self?.venueView?.setVenues(true)
-            }
-            if errorType != VenueErrorType.None {
-                self?.venueView?.showErrorAlert("venue service error", error, errorType)
-            }
-        })
-    }
-    
     func showSelectedVenue(venue: String) {
         if (!isLocationEnabled()) {
             venueView?.showErrorAlert("Location Disabled", "Please enable location", VenueErrorType.LocationAuthentication)
@@ -102,6 +80,11 @@ class VenuePresenter {
         guard let location = currentLocation else {
             getCurrentLocation()
             venueView?.showErrorAlert("Getting Location", "Please wait", VenueErrorType.WaitForLocation)
+            return
+        }
+        
+        guard URL(string: venue) != nil else {
+            venueView?.showErrorAlert("venue error", "venue catelog is invalid", VenueErrorType.JsonParse)
             return
         }
         
@@ -137,11 +120,33 @@ class VenuePresenter {
         return venuesToDisplay.count
     }
     
-    func configure(forRow row: Int, cell: SearchCell ) {
+    func configureCell(forRow row: Int, cell: SearchCell) {
         let venueViewData = venuesToDisplay[row]
         cell.title.text = venueViewData.name
         cell.rating.text = String(venueViewData.rating) + "⭐️"
         cell.distance.text = String(venueViewData.distance) + "m"
         cell.address.text = venueViewData.address
+    }
+    
+    private func getVenues(venue: String, longitude: Double, latitude: Double) {
+        self.venueView?.startLoading()
+        
+        venueService.getVenues(vanue: venue, longtitute: longitude, latitute: latitude, { [weak self] venues, error, errorType in
+            self?.venueView?.finishLoading()
+            if venues.count == 0 {
+                self?.venueView?.setVenues(false)
+            } else {
+                self?.venuesToDisplay = venues.map {
+                    return VenueViewData(name: $0.name,
+                                         address: $0.address,
+                                         distance: $0.distance,
+                                         rating: $0.rating)
+                }
+                self?.venueView?.setVenues(true)
+            }
+            if errorType != VenueErrorType.None {
+                self?.venueView?.showErrorAlert("venue service error", error, errorType)
+            }
+        })
     }
 }
