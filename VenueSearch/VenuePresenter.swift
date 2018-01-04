@@ -50,27 +50,6 @@ class VenuePresenter {
         }
     }
     
-    func isLocationEnabled() -> Bool {
-        if type(of: locationService).locationServicesEnabled() {
-            switch(type(of: locationService).authorizationStatus()) {
-            case .authorizedWhenInUse:
-                return true
-            default:
-                return false
-            }
-        } else {
-            return false
-        }
-    }
-    
-    func requestLocationPermission() {
-        locationService.requestWhenInUseAuthorization()
-    }
-    
-    func getCurrentLocation() {
-        locationService.requestLocation()
-    }
-    
     func showSelectedVenue(venue: String) {
         if (!isLocationEnabled()) {
             venueView?.showErrorAlert("Location Disabled", "Please enable location", VenueErrorType.LocationAuthentication)
@@ -128,6 +107,7 @@ class VenuePresenter {
         cell.address.text = venueViewData.address
     }
     
+    // MARK: helper
     private func getVenues(venue: String, longitude: Double, latitude: Double) {
         self.venueView?.startLoading()
         
@@ -148,5 +128,26 @@ class VenuePresenter {
                 self?.venueView?.showErrorAlert("venue service error", error, errorType)
             }
         })
+    }
+    
+    private func isLocationEnabled() -> Bool {
+        if type(of: locationService).locationServicesEnabled() {
+            switch(type(of: locationService).authorizationStatus()) {
+            case .authorizedWhenInUse:
+                return true
+            default:
+                return false
+            }
+        } else {
+            return false
+        }
+    }
+    
+    private func requestLocationPermission() {
+        locationService.requestWhenInUseAuthorization()
+    }
+    
+    private func getCurrentLocation() {
+        locationService.requestLocation()
     }
 }
