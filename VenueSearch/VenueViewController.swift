@@ -40,20 +40,6 @@ class ViewController: UIViewController {
 
 }
 
-extension ViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        venuePresenter.locaionUpdated(locations)
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        venuePresenter.locationError(error)
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        venuePresenter.locationAuthorizationChanged(status)
-    }
-}
-
 extension ViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         venueSelector.resignFirstResponder()
@@ -78,9 +64,6 @@ extension ViewController: UITableViewDataSource {
 }
 
 extension ViewController: VenueView {
-    func attachLocatoinDelegate(_ locationService: CLLocationManager) {
-        locationService.delegate = self
-    }
         
     func startLoading() {
         activityIndicator.startAnimating()
@@ -94,7 +77,7 @@ extension ViewController: VenueView {
         
     func setVenues(_ empty: Bool) {
         DispatchQueue.main.async {
-            self.venueTableView.isHidden = !empty
+            self.venueTableView.isHidden = empty
             self.venueTableView.reloadData()
         }
     }

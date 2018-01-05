@@ -13,11 +13,10 @@ protocol VenueView: NSObjectProtocol {
     func startLoading()
     func finishLoading()
     func setVenues(_ empty: Bool)
-    func attachLocatoinDelegate(_ locationService: CLLocationManager)
     func showErrorAlert(_ title: String, _ message: String, _ errorType: VenueErrorType)
 }
 
-class VenuePresenter {
+class VenuePresenter: NSObject {
     private let venueService: VenueService!
     private let locationService: CLLocationManager!
     private let venueCatelog = ["food", "drinks", "coffee", "shops", "arts", "outdoors", "sights", "trending", "topPicks"]
@@ -36,7 +35,7 @@ class VenuePresenter {
     
     func attachView(_ view: VenueView) {
         venueView = view
-        view.attachLocatoinDelegate(locationService)
+        locationService.delegate = self
     }
     
     func detachView() {
@@ -70,30 +69,6 @@ class VenuePresenter {
         getVenues(venue: venue, longitude: location.coordinate.longitude, latitude: location.coordinate.latitude)
     }
     
-    // MARK: location delegate
-    func locaionUpdated(_ locations: [CLLocation]) {
-        currentLocation = locations.last
-        if (!(venueView?.isVenueSelectorEnabled)!) {
-            venueView?.isVenueSelectorEnabled = true;
-            getVenues(venue: venueCatelog[0],
-                      longitude: currentLocation!.coordinate.longitude,
-                      latitude: currentLocation!.coordinate.latitude)
-        }
-    }
-    
-    func locationError(_ error: Error) {
-        print(error.localizedDescription)
-        venueView?.showErrorAlert("Location error", error.localizedDescription, VenueErrorType.Location)
-    }
-    
-    func locationAuthorizationChanged(_ status: CLAuthorizationStatus) {
-        print(status.hashValue)
-        if (status == CLAuthorizationStatus.authorizedAlways ||
-            status == CLAuthorizationStatus.authorizedWhenInUse) && currentLocation == nil {
-            getCurrentLocation()
-        }
-    }
-    
     // MARK: talbeView delegate
     func numberOfVenues() -> Int {
         return venuesToDisplay.count
@@ -114,7 +89,7 @@ class VenuePresenter {
         venueService.getVenues(vanue: venue, longtitute: longitude, latitute: latitude, { [weak self] venues, error, errorType in
             self?.venueView?.finishLoading()
             if venues.count == 0 {
-                self?.venueView?.setVenues(false)
+                self?.venueView?.setVenues(true)
             } else {
                 self?.venuesToDisplay = venues.map {
                     return VenueViewData(name: $0.name,
@@ -122,7 +97,7 @@ class VenuePresenter {
                                          distance: $0.distance,
                                          rating: $0.rating)
                 }
-                self?.venueView?.setVenues(true)
+                self?.venueView?.setVenues(false)
             }
             if errorType != VenueErrorType.None {
                 self?.venueView?.showErrorAlert("venue service error", error, errorType)
@@ -149,5 +124,30 @@ class VenuePresenter {
     
     private func getCurrentLocation() {
         locationService.requestLocation()
+    }
+}
+
+extension VenuePresenter: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        currentLocation = locations.last
+        if (!(venueView?.isVenueSelectorEnabled)!) {
+            venueView?.isVenueSelectorEnabled = true;
+            getVenues(venue: venueCatelog[0],
+                      longitude: currentLocation!.coordinate.longitude,
+                      latitude: currentLocation!.coordinate.latitude)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error.localizedDescription)
+        venueView?.showErrorAlert("Location error", error.localizedDescription, VenueErrorType.Location)
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        print(status.hashValue)
+        if (status == CLAuthorizationStatus.authorizedAlways ||
+            status == CLAuthorizationStatus.authorizedWhenInUse) && currentLocation == nil {
+            getCurrentLocation()
+        }
     }
 }

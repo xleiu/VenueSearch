@@ -36,7 +36,7 @@ class VenueViewMock : NSObject, VenueView {
     }
     
     func setVenues(_ empty: Bool) {
-        if empty {
+        if !empty {
             setVenuesCalled = true
         } else {
             setEmptyVenuesCalled = true
@@ -124,7 +124,7 @@ class VenuePresenterTest: XCTestCase {
         let sut = makeSUT(false)
         
         //when
-        sut.presenter.locaionUpdated([CLLocation(latitude: 60.2365327, longitude: 24.782747)])
+        sut.presenter.locationManager(sut.lc, didUpdateLocations: [CLLocation(latitude: 60.2365327, longitude: 24.782747)])
         sut.presenter.showSelectedVenue(venue: "something")
         
         //verify
@@ -137,7 +137,7 @@ class VenuePresenterTest: XCTestCase {
         let sut = makeSUT(true)
         
         //when
-        sut.presenter.locaionUpdated([CLLocation(latitude: 60.2365327, longitude: 24.782747)])
+        sut.presenter.locationManager(sut.lc, didUpdateLocations: [CLLocation(latitude: 60.2365327, longitude: 24.782747)])
         sut.presenter.showSelectedVenue(venue: "ö")
         
         //verify
@@ -152,7 +152,7 @@ class VenuePresenterTest: XCTestCase {
         let sut = makeSUT(true)
         
         //when
-        sut.presenter.locaionUpdated([CLLocation(latitude: 60.2365327, longitude: 24.782747)])
+        sut.presenter.locationManager(sut.lc, didUpdateLocations: [CLLocation(latitude: 60.2365327, longitude: 24.782747)])
         sut.presenter.showSelectedVenue(venue: "some")
         
         //verify
@@ -165,7 +165,7 @@ class VenuePresenterTest: XCTestCase {
         sut.service.errorType = .Network
         
         //when
-        sut.presenter.locaionUpdated([CLLocation(latitude: 60.2365327, longitude: 24.782747)])
+        sut.presenter.locationManager(sut.lc, didUpdateLocations: [CLLocation(latitude: 60.2365327, longitude: 24.782747)])
         sut.presenter.showSelectedVenue(venue: "something")
         
         //verify
@@ -174,7 +174,7 @@ class VenuePresenterTest: XCTestCase {
     
     func testTableViewDelegateNumberOfVenues() {
         let sut = makeSUT(false)
-        sut.presenter.locaionUpdated([CLLocation(latitude: 60.2365327, longitude: 24.782747)])
+        sut.presenter.locationManager(sut.lc, didUpdateLocations: [CLLocation(latitude: 60.2365327, longitude: 24.782747)])
         sut.presenter.showSelectedVenue(venue: "something")
         XCTAssertEqual(2, sut.presenter.numberOfVenues())
     }
@@ -192,12 +192,13 @@ class VenuePresenterTest: XCTestCase {
 //        XCTAssertEqual(cell.rating.text, String(sut.service.venues[0].address))
 //    }
     
-    private func makeSUT(_ isEmpty: Bool) -> (presenter: VenuePresenter, view: VenueViewMock, service:VenueServiceMock) {
+    private func makeSUT(_ isEmpty: Bool) -> (presenter: VenuePresenter, view: VenueViewMock, service:VenueServiceMock, lc: CLLocationManager) {
         let venueService = isEmpty ? emptyVenuesServiceMock : twoVenuesServiceMock
         let venueView = VenueViewMock()
-        let venuePresenter = VenuePresenter(venueService: venueService, locationService: MockLCManager())
+        let lc = MockLCManager()
+        let venuePresenter = VenuePresenter(venueService: venueService, locationService: lc)
         venuePresenter.attachView(venueView)
-        return (venuePresenter, venueView, venueService)
+        return (venuePresenter, venueView, venueService, lc)
     }
 }
 
@@ -221,7 +222,7 @@ class LocationServiceTest: XCTestCase {
     
     func testLocationServiceWithValidLocationShouldNotShowError() {
         let sut = makeSUT(false)
-        sut.presenter.locaionUpdated([CLLocation(latitude: 60.2365327, longitude: 24.782747)])
+        sut.presenter.locationManager(sut.lc, didUpdateLocations: [CLLocation(latitude: 60.2365327, longitude: 24.782747)])
         sut.presenter.showSelectedVenue(venue: "b")
         XCTAssertFalse(sut.view.locationNotAvailableCalled)
         XCTAssertFalse(sut.view.locationDisableCalled)
@@ -237,23 +238,23 @@ class LocationServiceTest: XCTestCase {
     func testLocationSerivceLocationUpdateWillTriggerFetchVenueForTheFirstTime() {
         let sut = makeSUT(false)
         sut.view.isVenueSelectorEnabled = false
-        sut.presenter.locaionUpdated([CLLocation(latitude: 60.2365327, longitude: 24.782747)])
+        sut.presenter.locationManager(sut.lc, didUpdateLocations: [CLLocation(latitude: 60.2365327, longitude: 24.782747)])
         XCTAssertTrue(sut.view.isVenueSelectorEnabled)
     }
     
     func testLocationServiceLocationAuthorizationChangedWillTriggerFetchLoaction() {
         let sut = makeSUT(false)
-        sut.presenter.locationAuthorizationChanged(.authorizedWhenInUse)
+        sut.presenter.locationManager(sut.lc, didChangeAuthorization: .authorizedWhenInUse)
         XCTAssertTrue(sut.lc.requestLocationCalled)
         
         sut.lc.requestLocationCalled = false
-        sut.presenter.locationAuthorizationChanged(.authorizedWhenInUse)
+        sut.presenter.locationManager(sut.lc, didChangeAuthorization: .authorizedWhenInUse)
         XCTAssertTrue(sut.lc.requestLocationCalled)
     }
     
     func testLocationServiceErrorWillTriggerAlert() {
         let sut = makeSUT(false)
-        sut.presenter.locationError("location error")
+        sut.presenter.locationManager(sut.lc, didFailWithError: "location error")
         XCTAssertTrue(sut.view.locationErrorCalled)
     }
     
