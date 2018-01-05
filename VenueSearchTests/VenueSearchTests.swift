@@ -179,6 +179,7 @@ class VenuePresenterTest: XCTestCase {
         XCTAssertEqual(2, sut.presenter.numberOfVenues())
     }
     
+    // TODO: how to test tableView cell if it is added from storyboard
 //    func testTableViewDelegateConfigCell() {
 //        let cell = SearchCell()
 //        let sut = makeSUT(false)
@@ -199,11 +200,12 @@ class VenuePresenterTest: XCTestCase {
         return (venuePresenter, venueView, venueService)
     }
 }
+
 extension String : Error {
     
 }
 
-class testLocationService: XCTestCase {
+class LocationServiceTest: XCTestCase {
     
     func testLocationServiceWithoutPermissionShouldShowLocationDisabledError() {
         let sut = makeSUT(true)
