@@ -13,7 +13,7 @@ protocol VenueView: NSObjectProtocol {
     func startLoading()
     func finishLoading()
     func setVenues(_ empty: Bool)
-    func showErrorAlert(_ title: String, _ message: String, _ errorType: VenueErrorType)
+    func showErrorAlert(_ title: String, _ message: String, _ errorType: VenueError)
 }
 
 class VenuePresenter: NSObject {
@@ -51,18 +51,18 @@ class VenuePresenter: NSObject {
     
     func showSelectedVenue(venue: String) {
         if (!isLocationEnabled()) {
-            venueView?.showErrorAlert("Location Disabled", "Please enable location", VenueErrorType.LocationAuthentication)
+            venueView?.showErrorAlert("Location Disabled", "Please enable location", .locationAuthenticationFailed)
             return;
         }
         
         guard let location = currentLocation else {
             getCurrentLocation()
-            venueView?.showErrorAlert("Getting Location", "Please wait", VenueErrorType.WaitForLocation)
+            venueView?.showErrorAlert("Getting Location", "Please wait", .locationRequestPending)
             return
         }
         
         guard URL(string: venue) != nil else {
-            venueView?.showErrorAlert("venue error", "venue catelog is invalid", VenueErrorType.JsonParse)
+            venueView?.showErrorAlert("venue error", "venue catelog is invalid", .requestFailed)
             return
         }
         
@@ -86,21 +86,25 @@ class VenuePresenter: NSObject {
     private func getVenues(venue: String, longitude: Double, latitude: Double) {
         self.venueView?.startLoading()
         
-        venueService.getVenues(vanue: venue, longtitute: longitude, latitute: latitude, { [weak self] venues, error, errorType in
+        venueService.getVenues(venue, longtitute: longitude, latitute: latitude, { [weak self] result in
             self?.venueView?.finishLoading()
-            if venues.count == 0 {
-                self?.venueView?.setVenues(true)
-            } else {
-                self?.venuesToDisplay = venues.map {
-                    return VenueViewData(name: $0.name,
-                                         address: $0.address,
-                                         distance: $0.distance,
-                                         rating: $0.rating)
+            switch result {
+            case .success(let venues):
+            
+                if venues.results.count == 0 {
+                    self?.venueView?.setVenues(true)
+                } else {
+                    self?.venuesToDisplay = venues.results.map {
+                        return VenueViewData(name: $0.name,
+                                             address: $0.address,
+                                             distance: $0.distance,
+                                             rating: $0.rating)
+                    }
+                    self?.venueView?.setVenues(false)
                 }
-                self?.venueView?.setVenues(false)
-            }
-            if errorType != VenueErrorType.None {
-                self?.venueView?.showErrorAlert("venue service error", error, errorType)
+                
+            case .failure(let error):
+                self?.venueView?.showErrorAlert("venue service error", error.localizedDescription, error)
             }
         })
     }
@@ -140,7 +144,7 @@ extension VenuePresenter: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(error.localizedDescription)
-        venueView?.showErrorAlert("Location error", error.localizedDescription, VenueErrorType.Location)
+        venueView?.showErrorAlert("Location error", error.localizedDescription, .locationError)
     }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
